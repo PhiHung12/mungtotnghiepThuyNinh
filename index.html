@@ -407,24 +407,21 @@
         /* ══ ẢNH BAY LÊN — kiểu Tết giống project tham khảo ══ */
         .flying-photo-wrapper {
             position: fixed;
-            top: 100vh;
+            bottom: -140px;
             left: 50%;
             transform: translateX(-50%) translateY(0);
             opacity: 0;
             pointer-events: none;
-            z-index: 790;
+            z-index: 810; /* Lớp bay nổi hẳn lên trên pháo hoa (800) */
         }
         .flying-photo-wrapper.fw-animate {
             animation: fwPhotoFloatUp var(--fly-dur, 7s) linear forwards;
         }
-        /* Chỉ animate "transform", không động tới top/bottom trong keyframes —
-           kết hợp top/bottom với transform trong animation gây lỗi render
-           (ảnh không hiện) trên nhiều trình duyệt. */
         @keyframes fwPhotoFloatUp {
-            0%   { opacity: 0;   transform: translateX(-50%) translateY(60px); }
+            0%   { opacity: 0;   transform: translateX(-50%) translateY(10vh); }
             12%  { opacity: 1; }
             88%  { opacity: 0.9; }
-            100% { opacity: 0;   transform: translateX(-50%) translateY(calc(-100vh - 220px)); }
+            100% { opacity: 0;   transform: translateX(-50%) translateY(-115vh); }
         }
         .flying-photo {
             display: block;
@@ -594,7 +591,6 @@
         .passcode-cancel:hover { color: rgba(255,255,255,0.9); }
     </style>
 
-    <!-- ========== PASSCODE SCREEN ========== -->
     <div id="passcodeScreen">
         <div class="passcode-bears" id="passcodeBears">
             <img src="assets/images/characters/bearwait.png" alt="" class="passcode-bear left pos-0" id="bearLeft">
@@ -677,7 +673,6 @@
                 <span id="letter-page-indicator">1 / 1</span>
                 <button type="button" class="letter-nav-btn" id="letterNextBtn">Tiếp ▶</button>
             </div>
-            <!-- Nút tim góc phải cuối thư -->
             <div id="letter-heart-close" style="display:none">
                 <div id="letter-heart-close-hint">Chạm vào đây để kết thúc ✨</div>
                 <button type="button" id="letter-heart-btn" aria-label="Kết thúc">❤️</button>
@@ -688,41 +683,19 @@
     <canvas id="webglCanvas"></canvas>
     <canvas id="fireworks-canvas"></canvas>
 
-    <!-- Bảo vệ DevTools -->
-    <!-- <script src="detect-devtools.js"></script> -->
     <script type='text/javascript'>
-        // Bypass for developers
         const keyName = 'key';
         const keyValue = '9ac7ec230e0e4513578f309d6d3579ad';
-        // Handle via config
-        //DisableDevtool({
-            //tkName: keyName,
-           // md5: keyValue,
-            //interval: '100',
-        //});
     </script>
-    <!-- ================================================================
-         APP CONFIG — Chỉnh sửa các giá trị tại đây
-         ================================================================ -->
     <script>
-    // Config mặc định (fallback khi không có dữ liệu từ backend)
     window.DEFAULT_APP_CONFIG = {
-        // ── Thông tin ứng dụng ──────────────────────────────────────────
         appTitle:          'Món Quà Nhỏ',
         appIcon:           'assets/images/icons/couple.png',
-
-        // ── Passcode ────────────────────────────────────────────────────
         passcode:          '0601',
         passcodeTitle:     'Nhập ngày sinh của Thị Ninh =)))',
         passcodeSubtitle:  'Mở món quà đặc biệt',
-
-        // ── Chữ morph hạt (theo thứ tự hiển thị) ───────────────────────
         morphTexts: ['happy', "chút mừn", 'Thùy Ninh', 'đã tốt nghiệp'],
-
-        // ── Ảnh morph thành hạt ─────────────────────────────────────────
         particleImage:     'assets/2.png',
-
-        // ── Ảnh quả cầu sphere ──────────────────────────────────────────
         sphereImages: [
             "assets/images/1.jpg",
             "assets/images/2.jpg",
@@ -733,10 +706,7 @@
             "assets/images/7.jpg",
             "assets/images/8.jpg",
             "assets/images/9.jpg",
-            // "assets/images/10.jpg"
         ],
-
-        // ── Nội dung lá thư ─────────────────────────────────────────────
         letter: {
             pages: [
                 {
@@ -757,22 +727,16 @@
             ]
         },
 
-        // ── Nhạc nền ────────────────────────────────────────────────────
         bgMusic:      'assets/music/em.mp3',
         bgVolume:     0.55,
         letterMusic:  'assets/music/em2.mp3',   // nhạc phát khi mở thư
         letterVolume: 0.65
     };
 
-    // Chuẩn hóa luồng lấy config:
-    // - preview=1  -> lấy từ IndexedDB (preview db), không có thì localStorage
-    // - ?<websiteId> -> gọi API womenday
-    // - không gì cả -> dùng DEFAULT_APP_CONFIG
     (function() {
         const params = new URLSearchParams(location.search);
         const preview = params.get('preview');
 
-        // Preview: ưu tiên IndexedDB (chịu được nhiều ảnh), fallback localStorage
         if (preview === '1') {
             window.APP_CONFIG_PROMISE = (function() {
                 const PREVIEW_DB_NAME = 'WomensDayPreviewDB', PREVIEW_STORE = 'preview', PREVIEW_KEY = 'config';
@@ -804,7 +768,6 @@
             return;
         }
 
-        // Website thật: query dạng ?<websiteId> (chỉ lấy segment đầu, bỏ phần Zalo/UTM phía sau)
         var rawSearch = window.location.search || '';
         var websiteId = '';
         if (rawSearch && rawSearch !== '?preview=1') {
@@ -821,7 +784,6 @@
                         window.APP_CONFIG = data.data;
                         return window.APP_CONFIG;
                     }
-                    // Hết hạn hoặc không tồn tại
                     const expired = data && data.expired;
                     const msg = (data && data.message) || (expired ? 'Website đã hết hạn.' : 'Không tìm thấy website.');
                     document.body.innerHTML = '<div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:2rem;font-family:system-ui;text-align:center;background:linear-gradient(135deg,#1a0a1c,#2d1b2e);box-sizing:border-box;color:#fff;">'
@@ -832,14 +794,12 @@
                     throw new Error(msg);
                 } catch (err) {
                     console.error('Lỗi tải config womenday:', err);
-                    // Trả về reject để module JS có thể dừng lại
                     throw err;
                 }
             })();
             return;
         }
 
-        // Trường hợp không có websiteId: dùng config mặc định
         if (!window.APP_CONFIG) {
             window.APP_CONFIG = window.DEFAULT_APP_CONFIG;
         }
@@ -869,13 +829,11 @@
 
         (async () => {
 
-        // Đọc config + feature flags (chờ nếu đang load từ API)
         let cfg;
         try {
             cfg = await (window.APP_CONFIG_PROMISE || Promise.resolve(window.APP_CONFIG || window.DEFAULT_APP_CONFIG || {}));
         } catch (e) {
             console.error('Dừng khởi tạo vì không tải được config:', e);
-            // Thường là website hết hạn hoặc không tồn tại -> body đã được thay bằng thông báo, nên không chạy tiếp.
             return;
         }
 
@@ -938,11 +896,9 @@
                     back.style.background = 'rgba(15,23,42,0.72)';
                 });
                 back.addEventListener('click', () => {
-                    // Ưu tiên quay lại tab trước (nếu được mở từ trang tạo)
                     if (window.history.length > 1) {
                         window.history.back();
                     } else {
-                        // Fallback: điều hướng thẳng về trang tạo cùng thư mục
                         window.location.href = 'config.html';
                     }
                 });
@@ -950,13 +906,12 @@
             }
         }
 
-        // Feature flags — mặc định bật (=== true để opt-in, !== false để opt-out)
-        const enablePasscode    = cfg.enablePasscode !== false;     // default: bật
-        const enableMorphEffect = cfg.enableMorphEffect !== false;  // default: bật
-        const enableSphere      = cfg.enableSphere !== false;       // default: bật
-        const enableSphereFlyingImages = cfg.enableSphereFlyingImages !== false; // default: bật
-        const enableLetter      = cfg.enableLetter !== false;       // default: bật
-        const enableWebsiteInfo = cfg.enableWebsiteInfo !== false;  // default: bật
+        const enablePasscode    = cfg.enablePasscode !== false;
+        const enableMorphEffect = cfg.enableMorphEffect !== false;
+        const enableSphere      = cfg.enableSphere !== false;
+        const enableSphereFlyingImages = cfg.enableSphereFlyingImages !== false;
+        const enableLetter      = cfg.enableLetter !== false;
+        const enableWebsiteInfo = cfg.enableWebsiteInfo !== false;
 
         let scene, camera, renderer, controls, clock;
         let composer, bloomPass; 
@@ -1002,7 +957,6 @@
         const flowVec = new THREE.Vector3();
         const currentVec = new THREE.Vector3();
 
-        /** Lấy vị trí + màu từ ảnh: độ phân giải cao, màu chính xác, chi tiết nét hơn. */
         function generateFromImage(img, count, size) {
             let w = img.naturalWidth || img.width;
             let h = img.naturalHeight || img.height;
@@ -1069,7 +1023,6 @@
             return { positions: points, colors };
         }
 
-        /** Tạo vị trí hạt từ chữ. Vẽ chữ lên canvas rồi lấy mẫu pixel. Có giới hạn chiều ngang, dài thì xuống dòng. */
         function generateFromText(text, count, size) {
             if (!text || !text.trim()) return null;
             const w = 800;
@@ -1306,16 +1259,13 @@
             isInitialized = true;
             animate();
 
-            // Rẽ nhánh theo feature flags
             if (enableMorphEffect) {
-                prepareAndWait();           // morph hạt → sphere (nếu enableSphere) → letter (nếu enableLetter)
+                prepareAndWait();           
             } else if (enableSphere) {
-                startSpherePhase();         // bỏ morph, vào thẳng sphere
+                startSpherePhase();         
             } else if (enableLetter) {
-                // Chỉ có lá thư: cho phong thư bay lên ngay
                 startCupidLetterSequence();
             }
-            // nếu cả ba đều tắt: chỉ render scene tối giản (không có gì xảy ra)
         }
 
         function setupPostProcessing() {
@@ -1343,24 +1293,15 @@
         const BACKGROUND_SCATTER_COUNT = 5000;
         const SEQUENCE_HOLD_MS = 1000;
         const MORPH_WAIT_MS = 2200;
-        /** Thời gian ảnh overlay fade từ mờ → rõ (ms). */
         const MORPH_OVERLAY_FADE_MS = 1200;
-        /** Thời gian giữ ảnh hiển thị trước khi nổ (ms). */
         const MORPH_OVERLAY_HOLD_MS = 3800;
 
         let _preloadedImg = null;
-        /** Mesh ảnh đè lên sau khi 80k hạt tạo xong (thay cho phase 280k). */
         let morphImageOverlay = null;
-        /** Thời điểm bắt đầu fade-in overlay (để animate() tăng opacity dần). */
         let morphOverlayFadeStartTime = null;
 
         function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-        /**
-         * Tạo plane ảnh trong scene 3D trên layer riêng (layer 1).
-         * Bloom chỉ chạy layer 0 (hạt), sau đó renderer vẽ thêm layer 1 không qua bloom
-         * → ảnh hiển thị đúng màu, không lóa, đúng vị trí với hạt.
-         */
         function createMorphImageOverlay(img) {
             const w = img.naturalWidth || img.width;
             const h = img.naturalHeight || img.height;
@@ -1369,7 +1310,6 @@
             const planeW = aspect >= 1 ? size : size * aspect;
             const planeH = aspect >= 1 ? size / aspect : size;
 
-            // Dùng canvas để render ảnh đủ kích thước, tránh mất nét do texture upload
             const srcW = img.naturalWidth  || img.width;
             const srcH = img.naturalHeight || img.height;
             const offscreen = document.createElement('canvas');
@@ -1382,11 +1322,11 @@
 
             const geometry = new THREE.PlaneGeometry(planeW, planeH, 1, 1);
             const texture  = new THREE.CanvasTexture(offscreen);
-            texture.generateMipmaps = false;          // tắt mipmap → không bị mờ do level blend
+            texture.generateMipmaps = false;          
             texture.minFilter       = THREE.LinearFilter;
             texture.magFilter       = THREE.LinearFilter;
             texture.anisotropy      = renderer.capabilities.getMaxAnisotropy();
-            texture.colorSpace      = THREE.SRGBColorSpace; // giữ màu chính xác
+            texture.colorSpace      = THREE.SRGBColorSpace; 
             texture.needsUpdate     = true;
             const material = new THREE.MeshBasicMaterial({
                 map: texture,
@@ -1398,9 +1338,8 @@
             });
             const mesh = new THREE.Mesh(geometry, material);
             mesh.position.set(0, 0, 0);
-            mesh.lookAt(camera.position);  // xoay mặt phẳng về phía camera → không bị méo perspective
+            mesh.lookAt(camera.position);  
             mesh.renderOrder = 10;
-            // layer 1 → bloom pass không thấy, renderer thứ hai mới vẽ
             mesh.layers.set(1);
             scene.add(mesh);
             return mesh;
@@ -1418,7 +1357,6 @@
             morphImageOverlay = null;
         }
 
-        /** Tạo 5000 hạt nền rải đều (thêm riêng, không lấy từ 80k). */
         function createBackgroundScatterLayer() {
             const count = BACKGROUND_SCATTER_COUNT;
             const positions = new Float32Array(count * 3);
@@ -1478,7 +1416,6 @@
             scene.add(backgroundParticleSystem);
         }
 
-        /** Tạo hạt rải ngẫu nhiên trong không gian (80k). + 5k nền riêng. */
         function initScatterParticles() {
             const count = AUTOPLAY_TEXT_COUNT;
             const positions = new Float32Array(count * 3);
@@ -1514,7 +1451,6 @@
             }
         }
 
-        /** Tải trước font + ảnh, tạo scatter, rồi hiện nút giữ */
         async function prepareAndWait() {
             await document.fonts.load('140px "Pacifico"');
             const imgSrc = (cfg.particleImage && String(cfg.particleImage).trim()) ? cfg.particleImage : null;
@@ -1531,7 +1467,6 @@
             initScatterParticles();
             isScatterPhase = true;
 
-            // setup nút giữ — Android: chạm 2 lần (lần 2 phát nhạc + chạy); iOS: ấn giữ 1s
             const wrap    = document.getElementById('start-wrap');
             const ringFill = document.getElementById('ring-fill');
             const startLabel = document.getElementById('start-label');
@@ -1617,7 +1552,6 @@
             }
 
             if (_preloadedImg) {
-                // ── Có ảnh: morph chữ → ảnh 80k hạt ──
                 const imgLow = generateFromImage(_preloadedImg, AUTOPLAY_TEXT_COUNT, CONFIG.textShapeSize);
                 if (imgLow) {
                     bloomPass.strength = 0.22;
@@ -1631,13 +1565,11 @@
                 }
                 await sleep(MORPH_WAIT_MS + 500);
 
-                // Hiển thị ảnh 2D đè lên canvas (không qua bloom → nét, không lóa)
                 isMorphing = false;
                 morphImageOverlay = createMorphImageOverlay(_preloadedImg);
                 morphOverlayFadeStartTime = clock.getElapsedTime();
                 await sleep(MORPH_OVERLAY_FADE_MS + MORPH_OVERLAY_HOLD_MS);
             } else {
-                // ── Không có ảnh: chờ ngắn rồi nổ luôn ──
                 await sleep(600);
             }
 
@@ -1650,7 +1582,7 @@
             }
         }
 
-        let isScatterPhase = false; // true khi đang ở trạng thái hạt trôi nổi ban đầu
+        let isScatterPhase = false; 
 
         // ── Explosion ──────────────────────────────────────────────────────
         let isExploding = false;
@@ -1717,14 +1649,11 @@
             if (cupidLetterState === 'flying') updateCupidFly();
 
             if (spPhase) {
-                // Sphere phase: bypass composer/bloom hoàn toàn để màu ảnh hiển thị đúng như gốc
                 renderer.render(scene, camera);
             } else if (morphImageOverlay) {
-                // Selective bloom: bloom chỉ chạy layer 0 (hạt), ảnh (layer 1) render sau không qua bloom
                 camera.layers.disable(1);
                 composer.render(deltaTime);
                 camera.layers.enable(1);
-                // Vẽ layer 1 lên trên không qua bloom
                 camera.layers.disable(0);
                 renderer.autoClear = false;
                 renderer.render(scene, camera);
@@ -1763,7 +1692,6 @@
                 return;
             }
 
-            // drift nhẹ cho hạt scatter (chỉ khi chưa bắt đầu sequence, isScatterPhase)
             const driftAmt = isScatterPhase ? 0.25 : 0;
             let needsEffectStrengthReset = false;
             for (let i = 0; i < particleCount; i++) {
@@ -1823,14 +1751,11 @@
         let cupidFlyStartTime = 0;
         const CUPID_FLY_DURATION_MS = 2000;
 
-        // ── Hỗ trợ nhiều trang thư ──────────────────────────────────────
-        // Chuẩn hóa cfg.letter thành mảng pages
         let LETTER_PAGES = [];
         if (cfg.letter) {
             if (Array.isArray(cfg.letter.pages) && cfg.letter.pages.length > 0) {
                 LETTER_PAGES = cfg.letter.pages;
             } else {
-                // Tương thích ngược: cấu trúc cũ {text, image, caption}
                 LETTER_PAGES = [{
                     text:    cfg.letter.text    || "Happy Women's Day!",
                     image:   cfg.letter.image   || '',
@@ -1843,7 +1768,6 @@
         let currentLetterPage = 0;
         let isTyping = false;
 
-        // Dùng CUPID_LETTER_TEXT cho trang hiện tại (tương thích cũ)
         const CUPID_LETTER_TEXT = LETTER_PAGES[0].text;
 
         function spRandOnSphere(r) {
@@ -1990,7 +1914,6 @@
                 if (enableSphereFlyingImages) {
                     document.getElementById('btn-flying-corner').classList.add('visible');
                 } else {
-                    // Ảnh bay tắt + thư bật: click lần 2 vào quả cầu → chuyển thẳng sang hiện thư
                     const flash = document.createElement('div');
                     flash.style.cssText = 'position:fixed;inset:0;background:radial-gradient(circle,rgba(255,105,180,0.8) 0%,transparent 70%);pointer-events:none;z-index:1000;animation:flashFade 1s ease-out forwards;';
                     document.body.appendChild(flash);
@@ -2102,9 +2025,7 @@
                     setTimeout(() => {
                         if (cursor) cursor.style.display = 'none';
                         letterContent.classList.add('typing-complete');
-                        // Hiện ảnh của trang này
                         showLetterPageImage(page);
-                        // Hiện nav nếu có nhiều trang
                         updateLetterNav();
                     }, 400);
                 }
@@ -2130,7 +2051,6 @@
                 captionEl.textContent = captionText || '';
                 captionEl.style.display = captionText ? 'block' : 'none';
             }
-            // Ẩn tap tip nếu là trang cuối
             if (tapTip) {
                 tapTip.style.display = (currentLetterPage < LETTER_PAGES.length - 1) ? 'block' : 'none';
             }
@@ -2155,12 +2075,10 @@
             if (indicator) indicator.textContent = `${currentLetterPage + 1} / ${LETTER_PAGES.length}`;
             if (prevBtn) prevBtn.disabled = (currentLetterPage === 0);
             if (nextBtn) nextBtn.disabled = (currentLetterPage === LETTER_PAGES.length - 1);
-            // Trang cuối: hiện nút tim, bắn tim rơi
             const isLastPage = currentLetterPage === LETTER_PAGES.length - 1;
             if (heartClose) heartClose.style.display = isLastPage ? 'flex' : 'none';
             if (isLastPage) {
                 setTimeout(spawnHeartParticles, 400);
-                // Gắn sự kiện nút tim (1 lần)
                 const heartBtn = document.getElementById('letter-heart-btn');
                 if (heartBtn && !heartBtn.dataset.bound) {
                     heartBtn.dataset.bound = '1';
@@ -2169,15 +2087,12 @@
             }
         }
 
-        // ══ ĐÓNG THƯ → ẢNH BAY + PHÁO HOA ══
         function onHeartCloseClick() {
-            // 1. Đóng khung thư
             const overlay = document.getElementById('cupid-letter-overlay');
             const frame   = document.getElementById('cupid-letter-frame');
             if (frame)   { frame.style.transition = 'opacity 0.5s ease'; frame.style.opacity = '0'; setTimeout(() => { frame.classList.remove('visible'); frame.style.opacity = ''; frame.style.transition = ''; }, 500); }
             if (overlay) { setTimeout(() => overlay.classList.remove('visible'), 500); }
 
-            // 2. Bắt đầu ảnh bay + pháo hoa sau khi thư tắt
             setTimeout(() => {
                 launchFlyingPhotos();
                 startFireworks();
@@ -2189,25 +2104,24 @@
                          : (cfg.letter && cfg.letter.pages ? cfg.letter.pages.map(p => p.image).filter(Boolean) : []);
             if (!images.length) return;
 
-            const count   = Math.min(images.length, 9);
-            const picked  = [...images].sort(() => Math.random() - 0.5).slice(0, count);
-            const W = window.innerWidth;
-
-            picked.forEach((src, i) => {
-                // wrapper chịu trách nhiệm vị trí ngang + animation bay
+            // Số lượng ảnh muốn bay lên (45 ảnh để kín màn hình)
+            const totalToSpawn = 45; 
+            
+            for (let i = 0; i < totalToSpawn; i++) {
+                const src = images[i % images.length];
                 const wrapper = document.createElement('div');
                 wrapper.className = 'flying-photo-wrapper';
 
-                // vị trí ngang rải đều
-                const slotW = 100 / count;
-                const leftPct = slotW * i + slotW * 0.1 + Math.random() * slotW * 0.6;
-                wrapper.style.left = Math.min(Math.max(5, leftPct), 92) + '%';
+                // Rải đều vị trí ngang ngẫu nhiên trên toàn màn hình (5% -> 90%)
+                wrapper.style.left = (5 + Math.random() * 85) + '%';
 
-                const dur   = 6 + Math.random() * 4;
-                const delay = i * 0.18 + Math.random() * 0.2;
+                // Thời gian bay (4s - 7s)
+                const dur = 8 + Math.random() * 3;
+                // Thời điểm xuất hiện ngẫu nhiên trong khoảng 4.5 giây đầu
+                const delay = Math.random() * 7;
+                
                 wrapper.style.setProperty('--fly-dur', dur + 's');
 
-                // img bên trong — glow hồng
                 const el = document.createElement('img');
                 el.className = 'flying-photo';
                 el.src = src;
@@ -2216,18 +2130,17 @@
                 wrapper.appendChild(el);
                 document.body.appendChild(wrapper);
 
-                // Kích hoạt animation sau delay
                 setTimeout(() => {
                     wrapper.classList.add('fw-animate');
                 }, delay * 1000);
 
                 setTimeout(() => wrapper.remove(), (dur + delay + 0.5) * 1000);
-            });
+            }
         }
 
         function clamp(min, val, max) { return Math.max(min, Math.min(max, val)); }
 
-        // ══ PHÁO HOA VẬT LÝ — Port từ project chucmungnammoi ══
+        // ══ PHÁO HOA VẬT LÝ ══
         let fwRAF = null;
         let fwAudioCtx = null;
         let fwRunning = false;
@@ -2240,7 +2153,6 @@
             canvas.style.display = 'block';
             fwRunning = true;
 
-            // ── Khởi tạo Web Audio ──
             try {
                 const AC = window.AudioContext || window.webkitAudioContext;
                 if (AC && !fwAudioCtx) fwAudioCtx = new AC();
@@ -2250,19 +2162,15 @@
             function playLift() {
                 if (!fwAudioCtx) return;
                 try {
-                    const dur = 0.6;
+                    const dur = 0.9, sr = fwAudioCtx.sampleRate;
                     const osc = fwAudioCtx.createOscillator();
-                    const filter = fwAudioCtx.createBiquadFilter();
                     const gain = fwAudioCtx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(70, fwAudioCtx.currentTime);
-                    osc.frequency.linearRampToValueAtTime(220, fwAudioCtx.currentTime + dur * 0.85);
-                    filter.type = 'lowpass';
-                    filter.frequency.value = 900;
-                    gain.gain.setValueAtTime(0.001, fwAudioCtx.currentTime);
-                    gain.gain.linearRampToValueAtTime(0.05, fwAudioCtx.currentTime + 0.08);
+                    osc.type = 'sine'; // Sóng sine cực êm
+                    osc.frequency.setValueAtTime(150, fwAudioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(300, fwAudioCtx.currentTime + dur);
+                    gain.gain.setValueAtTime(0.025, fwAudioCtx.currentTime); // Âm lượng nhỏ
                     gain.gain.exponentialRampToValueAtTime(0.001, fwAudioCtx.currentTime + dur);
-                    osc.connect(filter); filter.connect(gain); gain.connect(fwAudioCtx.destination);
+                    osc.connect(gain); gain.connect(fwAudioCtx.destination);
                     osc.start(); osc.stop(fwAudioCtx.currentTime + dur);
                 } catch(e) {}
             }
@@ -2270,32 +2178,28 @@
             function playBurst(scale) {
                 if (!fwAudioCtx) return;
                 try {
-                    const dur = 1.1, sr = fwAudioCtx.sampleRate;
+                    const dur = 1.2, sr = fwAudioCtx.sampleRate;
                     const buf = fwAudioCtx.createBuffer(1, sr * dur, sr);
                     const d = buf.getChannelData(0);
                     for (let i = 0; i < d.length; i++) {
                         const t = i / sr;
-                        d[i] = Math.exp(-t * 9)  * (Math.random() * 2 - 1) * 0.6
-                              + Math.exp(-t * 3)  * (Math.random() * 2 - 1) * 0.25;
+                        d[i] = Math.exp(-t * 15) * (Math.random() * 2 - 1) * 0.35
+                              + Math.exp(-t * 25) * Math.sin(6.28 * 300 * t) * 0.25;
                     }
                     const src = fwAudioCtx.createBufferSource();
                     src.buffer = buf;
-                    const filter = fwAudioCtx.createBiquadFilter();
-                    filter.type = 'lowpass';
-                    filter.frequency.value = 1400;
                     const comp = fwAudioCtx.createDynamicsCompressor();
-                    comp.threshold.value = -18; comp.ratio.value = 4;
-                    comp.attack.value = 0.003; comp.release.value = 0.3;
+                    comp.threshold.value = -20; comp.ratio.value = 4;
+                    comp.attack.value = 0.001; comp.release.value = 0.25;
                     const gain = fwAudioCtx.createGain();
-                    const vol = (scale || 1) * 0.28;
+                    const vol = (scale || 1) * 0.12; // Âm lượng nổ rất nhỏ
                     gain.gain.setValueAtTime(vol, fwAudioCtx.currentTime);
                     gain.gain.exponentialRampToValueAtTime(0.001, fwAudioCtx.currentTime + dur);
-                    src.connect(filter); filter.connect(comp); comp.connect(gain); gain.connect(fwAudioCtx.destination);
+                    src.connect(comp); comp.connect(gain); gain.connect(fwAudioCtx.destination);
                     src.start();
                 } catch(e) {}
             }
 
-            // ── Màu sắc pháo hoa Tết ──
             const COLORS = {
                 Red: '#ff0043', Green: '#14fc56', Blue: '#1e7fff',
                 Purple: '#e60aff', Gold: '#ffbf36', White: '#ffffff',
@@ -2304,8 +2208,7 @@
             function randColor() { return COLOR_LIST[(Math.random() * COLOR_LIST.length) | 0]; }
             function whiteOrGold() { return Math.random() < 0.5 ? COLORS.Gold : COLORS.White; }
 
-            // ── Star pool ──
-            const activeStar = {}; // color → []
+            const activeStar = {}; 
             const starPool = [];
             COLOR_LIST.forEach(c => activeStar[c] = []);
 
@@ -2327,7 +2230,6 @@
                 return s;
             }
 
-            // ── Spark pool ──
             const activeSpark = {};
             const sparkPool = [];
             COLOR_LIST.forEach(c => activeSpark[c] = []);
@@ -2344,11 +2246,9 @@
                 return s;
             }
 
-            // ── BurstFlash ──
             const burstFlashes = [];
             function addBurstFlash(x, y, r) { burstFlashes.push({ x, y, r }); }
 
-            // ── Tạo vụ nổ tròn ──
             const PI2 = Math.PI * 2;
             function createBurst(count, factory) {
                 const R = 0.5 * Math.sqrt(count / Math.PI);
@@ -2366,7 +2266,6 @@
                 }
             }
 
-            // ── Shell types ──
             function shellCrysanthemum(size) {
                 const color = randColor();
                 const glitter = Math.random() < 0.25;
@@ -2425,7 +2324,6 @@
 
             const shellTypes = [shellCrysanthemum, shellPalm, shellRing, shellWillow];
 
-            // ── Shell burst logic ──
             function burstShell(opts, x, y) {
                 const speed = opts.spreadSize / 96;
                 const stdInitY = -opts.spreadSize / 1800;
@@ -2480,7 +2378,6 @@
                     createBurst(starCount, starFactory);
                 }
 
-                // Pistil
                 if (opts.pistil && opts.pistilColor) {
                     burstShell({
                         spreadSize: opts.spreadSize * 0.5,
@@ -2495,7 +2392,6 @@
                 addBurstFlash(x, y, opts.spreadSize / 4);
             }
 
-            // ── Shell launch (rocket → burst) ──
             const rockets = [];
 
             function launchShell(posX, heightFrac) {
@@ -2507,7 +2403,6 @@
                 const burstY = minHeight - heightFrac * (minHeight - vpad);
                 const vel = Math.pow((ly - burstY) * 0.04, 0.64);
 
-                // Chọn loại shell ngẫu nhiên + kích thước
                 const baseSize = 2 + Math.random() * 1.5;
                 const shellFn = shellTypes[(Math.random() * shellTypes.length) | 0];
                 const opts = shellFn(baseSize);
@@ -2525,32 +2420,24 @@
                 playLift();
             }
 
-            // ── Lịch bắn — SIÊU NHIỀU pháo hoa, nhịp bắn CHẬM hơn (giãn cách dài hơn) ──
             const W = canvas.width, H = canvas.height;
             const schedule = [];
-            let _t = 0;
-            const SHELL_TOTAL = 38; // nhiều quả hơn hẳn so với trước (24 quả)
-            for (let i = 0; i < SHELL_TOTAL; i++) {
-                const x = 0.12 + Math.random() * 0.76;
-                const h = 0.55 + Math.random() * 0.35;
-                schedule.push({ t: _t, x, h });
-                // ~28% số lần bắn thêm 1 quả phụ cùng lúc cho cảm giác rộn ràng,
-                // nhưng nhịp CHÍNH vẫn chậm vì khoảng cách giữa các lần bắn được kéo dài ở dưới
-                if (Math.random() < 0.28) {
-                    const x2 = clamp(0.08, x + (Math.random() - 0.5) * 0.35, 0.92);
-                    schedule.push({ t: _t, x: x2, h: 0.5 + Math.random() * 0.4 });
-                }
-                _t += 750 + Math.random() * 550; // chậm hơn: cách nhau 750–1300ms (trước chỉ 400–600ms)
+            // Bắn 55 quả pháo ngẫu nhiên rợp trời trong suốt 18 giây
+            for (let i = 0; i < 55; i++) {
+                schedule.push({
+                    t: Math.random() * 18000, 
+                    x: 0.1 + (Math.random() * 0.8),
+                    h: 0.55 + (Math.random() * 0.35)
+                });
             }
 
             schedule.forEach(({ t, x, h }) => {
                 setTimeout(() => {
                     if (!fwRunning) return;
-                    launchShell(x + (Math.random() - 0.5) * 0.07, h);
+                    launchShell(x, h);
                 }, t);
             });
 
-            // ── Render loop ──
             const trailCanvas = document.createElement('canvas');
             trailCanvas.width = canvas.width;
             trailCanvas.height = canvas.height;
@@ -2559,7 +2446,7 @@
 
             const GRAVITY = 0.9;
             let lastTime = null;
-            const TOTAL_MS = _t + 3000; // khớp với lịch bắn mới (đã kéo dài), +3s cho quả cuối nổ và tàn
+            const TOTAL_MS = 20000; // Tổng thời gian pháo hoa (20 giây)
             const startMs = Date.now();
 
             function fwTick(now) {
@@ -2572,13 +2459,11 @@
                 const starDrag = 1 - (1 - 0.98) * speed;
                 const sparkDrag = 1 - (1 - 0.9) * speed;
 
-                // Trails fade
                 trailCtx.globalCompositeOperation = 'source-over';
                 trailCtx.fillStyle = `rgba(0,0,0,${0.175 * speed})`;
                 trailCtx.fillRect(0, 0, canvas.width, canvas.height);
                 mainCtx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // ── Rockets ──
                 for (let i = rockets.length - 1; i >= 0; i--) {
                     const r = rockets[i];
                     if (r.dead) { rockets.splice(i, 1); continue; }
@@ -2586,16 +2471,14 @@
                     if (r.trail.length > 12) r.trail.shift();
                     r.x += r.speedX * speed;
                     r.y += r.speedY * speed;
-                    r.speedY += gAcc * 0.6; // nhẹ hơn star để bay cao hơn
+                    r.speedY += gAcc * 0.6; 
 
-                    // Đến đích hay đổi chiều (bắt đầu rơi) → nổ
                     if (r.y <= r.targetY || r.speedY >= 0) {
                         r.dead = true;
                         burstShell(r.opts, r.x, r.y);
                         playBurst(0.85 + Math.random() * 0.15);
                     }
 
-                    // Vẽ trail rocket
                     trailCtx.globalCompositeOperation = 'lighten';
                     for (let ti = 0; ti < r.trail.length - 1; ti++) {
                         const a = (ti / r.trail.length) * 0.7;
@@ -2609,7 +2492,6 @@
                         trailCtx.stroke();
                     }
                     trailCtx.globalAlpha = 1;
-                    // Đầu rocket
                     mainCtx.beginPath();
                     mainCtx.arc(r.x, r.y, 2, 0, PI2);
                     mainCtx.fillStyle = '#ffffff';
@@ -2617,7 +2499,6 @@
                     mainCtx.fill();
                 }
 
-                // ── BurstFlash ──
                 for (let i = burstFlashes.length - 1; i >= 0; i--) {
                     const bf = burstFlashes[i];
                     const grad = trailCtx.createRadialGradient(bf.x, bf.y, 0, bf.x, bf.y, bf.r);
@@ -2631,7 +2512,6 @@
                     burstFlashes.splice(i, 1);
                 }
 
-                // ── Stars ──
                 trailCtx.globalCompositeOperation = 'lighten';
                 trailCtx.lineWidth = 3;
                 trailCtx.lineCap = 'round';
@@ -2660,7 +2540,6 @@
                         s.speedY *= starDrag;
                         s.speedY += gAcc;
 
-                        // Secondcolor transition (invisible stars)
                         if (s.secondColor && s.life < s.transitionTime && !s.colorChanged) {
                             s.colorChanged = true;
                             stars.splice(i, 1);
@@ -2670,7 +2549,6 @@
                             continue;
                         }
 
-                        // Sparks
                         if (s.sparkFreq) {
                             s.sparkTimer -= timeStep;
                             const burnRate = Math.pow(s.life / s.fullLife, 0.5);
@@ -2691,7 +2569,6 @@
                     trailCtx.stroke();
                 });
 
-                // ── Sparks ──
                 trailCtx.lineWidth = 0.75;
                 trailCtx.lineCap = 'butt';
                 COLOR_LIST.forEach(color => {
@@ -2715,7 +2592,6 @@
                     trailCtx.stroke();
                 });
 
-                // Vẽ trails + main lên canvas chính
                 mainCtx.globalAlpha = 1;
                 mainCtx.globalCompositeOperation = 'source-over';
                 mainCtx.drawImage(trailCanvas, 0, 0);
@@ -2724,7 +2600,6 @@
                 if (elapsed < TOTAL_MS || totalActive > 0) {
                     fwRAF = requestAnimationFrame(fwTick);
                 } else {
-                    // Fade out canvas
                     fwRunning = false;
                     let alpha = 1;
                     const fadeOut = setInterval(() => {
@@ -2753,7 +2628,6 @@
             const imgEl         = document.getElementById('letterInlineImage');
             const wrap          = document.getElementById('letterImageWrap');
             if (!letterContent) return;
-            // Flip ảnh ra
             if (imgEl && wrap && wrap.style.display !== 'none') {
                 imgEl.classList.add('img-flip-out');
                 setTimeout(() => {
@@ -2762,7 +2636,6 @@
                     setTimeout(() => imgEl.classList.remove('img-flip-in'), 350);
                 }, 300);
             }
-            // Fade nội dung thư
             letterContent.style.transition = 'opacity 0.25s ease';
             letterContent.style.opacity = '0';
             setTimeout(() => {
@@ -2770,7 +2643,6 @@
                 letterContent.textContent = '';
                 letterContent.classList.remove('typing-complete');
                 letterContent.style.opacity = '1';
-                // Ẩn ảnh trước khi gõ
                 if (wrap) { wrap.style.display = 'none'; wrap.classList.remove('visible'); }
                 if (imgEl) { imgEl.src = ''; }
                 const cursor = document.createElement('span');
@@ -2803,11 +2675,9 @@
             cupidLetterState = 'showingLetter';
             currentLetterPage = 0;
             isTyping = false;
-            // Khi không có nút ấn giữ (không hiệu ứng hạt), phát nhạc lần đầu khi ấn vào lá thư
             if (typeof startBgMusic === 'function') {
                 try { startBgMusic(); } catch (_) {}
             }
-            // Chuyển sang nhạc thư (fade mượt)
             switchToLetterMusic();
             document.getElementById('letter-envelope-img')?.classList.remove('visible');
             const letterFrame = document.getElementById('cupid-letter-frame');
@@ -2827,14 +2697,12 @@
                 const cursor = document.createElement('span');
                 cursor.className = 'letter-cursor';
                 letterContent.appendChild(cursor);
-                // Khung rung nhẹ khi mở
                 letterFrame.classList.remove('shaking');
                 letterFrame.classList.add('visible');
                 void letterFrame.offsetWidth;
                 letterFrame.classList.add('shaking');
                 startLetterTypingEffect(letterContent, cursor);
             }
-            // Gắn sự kiện nút điều hướng (chỉ gắn 1 lần)
             const prevBtn = document.getElementById('letterPrevBtn');
             const nextBtn = document.getElementById('letterNextBtn');
             if (prevBtn && !prevBtn.dataset.bound) {
@@ -2845,7 +2713,6 @@
                 nextBtn.dataset.bound = '1';
                 nextBtn.addEventListener('click', () => goToLetterPage(1));
             }
-            // Tap vào ảnh → trang tiếp theo
             const imgEl = document.getElementById('letterInlineImage');
             if (imgEl && !imgEl.dataset.bound) {
                 imgEl.dataset.bound = '1';
@@ -2854,19 +2721,15 @@
         }
 
         async function startSpherePhase() {
-            // Nếu trước đó có hiệu ứng hạt thì chờ 3.4s để xem explosion,
-            // còn nếu bỏ morph (chỉ quả cầu) thì không cần chờ.
             if (enableMorphEffect) {
                 await sleep(3400);
             } else {
                 await sleep(0);
             }
-            // fade to black
             const overlay = document.getElementById('transition-overlay');
             overlay.style.opacity = '1';
             await sleep(400);
 
-            // cleanup particles (main + nền 5k) và overlay ảnh morph
             removeMorphImageOverlay();
             if (particleSystem) { scene.remove(particleSystem); particlesGeometry.dispose(); particlesMaterial.dispose(); }
             particleSystem = null; particleCount = 0;
@@ -2882,10 +2745,8 @@
             scene.fog = null;
             scene.background = new THREE.Color(0x000000);
             bloomPass.strength = 0; bloomPass.threshold = 1;
-            // Match r128 LinearEncoding behavior: raw sRGB values pass through unchanged
             renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 
-            // reset camera & controls for sphere
             camera.fov = 75; camera.updateProjectionMatrix();
             if (isMobileSP) {
                 camera.position.set(0, 0, 16);
@@ -2901,11 +2762,9 @@
             controls.minAzimuthAngle = -Math.PI * 0.45; controls.maxAzimuthAngle = Math.PI * 0.45;
             controls.update();
 
-            // hide start-wrap, info panel
             document.getElementById('start-wrap').style.display = 'none';
             document.getElementById('ui').style.display = 'none';
 
-            // build sphere objects
             spGroup = new THREE.Group(); scene.add(spGroup);
             spClickSphere = new THREE.Mesh(
                 new THREE.SphereGeometry(SP_RADIUS * 1.1, 32, 32),
@@ -2914,7 +2773,6 @@
             spClickSphere.renderOrder = -1; scene.add(spClickSphere);
             spRaycaster = new THREE.Raycaster(); spMouse = new THREE.Vector2();
 
-            // sphere particles halo
             const sCnt = 600, sPos = new Float32Array(sCnt*3), sCol = new Float32Array(sCnt*3);
             for (let i = 0; i < sCnt; i++) {
                 const t2 = Math.random()*Math.PI*2, p2 = Math.acos(2*Math.random()-1), r2 = SP_RADIUS*1.2+Math.random()*3;
@@ -2927,7 +2785,6 @@
             spParticlesMesh = new THREE.Points(sGeo, new THREE.PointsMaterial({ size: 0.04, vertexColors: true, transparent: true, opacity: 0.8 }));
             scene.add(spParticlesMesh);
 
-            // rain up
             const rPos = new Float32Array(SP_RAIN_COUNT*3), rCol = new Float32Array(SP_RAIN_COUNT*3);
             for (let i = 0; i < SP_RAIN_COUNT; i++) {
                 rPos[i*3]=(Math.random()-.5)*2*SP_FLYOUT_BOUND; rPos[i*3+1]=-SP_FLYOUT_BOUND+Math.random()*2*SP_FLYOUT_BOUND; rPos[i*3+2]=(Math.random()-.5)*2*SP_FLYOUT_BOUND;
@@ -2940,7 +2797,6 @@
             spRainMesh = new THREE.Points(rGeo, new THREE.PointsMaterial({ size: 0.035, vertexColors: true, transparent: true, opacity: 0.75 }));
             spRainMesh.renderOrder = 998; scene.add(spRainMesh);
 
-            // CSS particles background
             const bg = document.getElementById('sphere-particles-bg');
             for (let i = 0; i < 30; i++) {
                 const d = document.createElement('div'); d.className = 'sp-particle';
@@ -2949,7 +2805,6 @@
             }
             bg.style.opacity = '1';
 
-            // load textures then build sphere
             const loader = new THREE.TextureLoader(); loader.crossOrigin = 'anonymous';
             Promise.all(SPHERE_IMAGES.map(url => new Promise(res => loader.load(url, res, undefined, () => res(null)))))
             .then(textures => {
@@ -2962,12 +2817,10 @@
                     spTextures = [new THREE.CanvasTexture(fc)];
                     spSphereImageUrls = [];
                 }
-                // Match r128: treat textures as linear (no sRGB decode) — raw values pass through
                 spTextures.forEach(t => { t.colorSpace = THREE.LinearSRGBColorSpace; t.needsUpdate = true; });
                 spBuildSphere();
                 spPhase = true;
 
-                // tap handlers
                 const canvasEl = renderer.domElement;
                 function spDown(e) { const c = e.touches?.[0]||e; spMouseDownX=c.clientX; spMouseDownY=c.clientY; spIsPointerDown=true; spWasDrag=false; }
                 function spMove(e) { const c = e.touches?.[0]||e; if (spIsPointerDown) { if (Math.hypot(c.clientX-spMouseDownX,c.clientY-spMouseDownY)>SP_DRAG_THRESHOLD) spWasDrag=true; } }
@@ -2987,17 +2840,14 @@
                     startCupidLetterSequence();
                 });
 
-                // fade overlay out
                 overlay.style.opacity = '0';
             });
         }
 
         function updateSpherePhase() {
             spTime += 0.01;
-            // hints
             if (spIntroComplete && !spHintClickShown && spIntroCompleteTime > 0 && (Date.now()-spIntroCompleteTime) >= SP_HINT_DELAY_MS) { spHintClickShown=true; spShowHint('Click vào nhé'); }
             if (spHasZoomedIn && !spIsExploded && !spHintFlyShown && spZoomInTime > 0 && (Date.now()-spZoomInTime) >= SP_HINT_DELAY_MS) { spHintFlyShown=true; spShowHint('Click lần nữa nào'); }
-            // rain
             if (spRainMesh && spRainPositions) {
                 const n = spRainPositions.length/3;
                 for (let j = 0; j < n; j++) {
@@ -3006,7 +2856,6 @@
                 }
                 spRainMesh.geometry.attributes.position.needsUpdate = true;
             }
-            // explosion / floating
             if (spIsExploded) {
                 spExplosionProgress = Math.min(1, spExplosionProgress+0.018);
                 spFadeProgress = Math.min(1, spFadeProgress+0.04);
@@ -3037,7 +2886,6 @@
                 spGroup.rotation.y += 0.001;
                 if (spParticlesMesh) { spParticlesMesh.rotation.y+=0.0005; spParticlesMesh.rotation.x+=0.00025; }
             }
-            // intro
             if (!spIntroComplete && spIntroStartTime > 0 && spMeshes.length > 0) {
                 const elapsed = Date.now()-spIntroStartTime, dur = SP_INTRO_DURATION_MS/1000;
                 spMeshes.forEach(mesh => {
@@ -3052,11 +2900,7 @@
                 }
             }
         }
-        // ════════════════════════════════════════════════════════════════
 
-        // ════════════════════════════════════════════════════════════════
-        // Áp dụng config vào head (title, icon, passcode UI)
-        // ════════════════════════════════════════════════════════════════
         (function applyCfgToDOM() {
             const title = (enableWebsiteInfo && cfg.appTitle) ? cfg.appTitle : 'Món Quà Nhỏ';
             document.title = title;
@@ -3072,9 +2916,6 @@
             if (passcodeSubtitle && cfg.passcodeSubtitle) passcodeSubtitle.textContent = cfg.passcodeSubtitle;
         })();
 
-        // ════════════════════════════════════════════════════════════════
-        // PWA Manifest (Android only, iOS dùng apple-touch-icon)
-        // ════════════════════════════════════════════════════════════════
         (function() {
             var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
             if (isIOS) return;
@@ -3100,12 +2941,8 @@
             } catch(e) {}
         })();
 
-        // ════════════════════════════════════════════════════════════════
-        // NHẠC NỀN
-        // ════════════════════════════════════════════════════════════════
         const defaultMusicUrl = 'assets/music/bgmucsic.mp3';
         let bgMusicSrc = cfg.bgMusic || defaultMusicUrl;
-        // Data URL (nhạc chọn từ máy) nhiều trình duyệt/Safari không phát ổn → đổi sang blob URL
         if (typeof bgMusicSrc === 'string' && bgMusicSrc.trim().startsWith('data:')) {
             try {
                 const arr = bgMusicSrc.split(',');
@@ -3154,7 +2991,6 @@
             }
         }
 
-        // ── Nhạc riêng cho lá thư ────────────────────────────────────────
         const letterMusicSrc = cfg.letterMusic || '';
         const letterMusic = letterMusicSrc ? new Audio(letterMusicSrc) : null;
         if (letterMusic) {
@@ -3165,11 +3001,10 @@
         let _letterMusicFadeTimer = null;
 
         function switchToLetterMusic() {
-            if (!letterMusic) return; // Không có file → giữ nhạc cũ
+            if (!letterMusic) return; 
             const targetVol = typeof cfg.letterVolume === 'number' ? cfg.letterVolume : 0.65;
-            // Fade out nhạc nền
             const bgVol0 = bgMusic.volume;
-            const steps = 20, interval = 50; // 1s fade
+            const steps = 20, interval = 50; 
             let step = 0;
             clearInterval(_letterMusicFadeTimer);
             _letterMusicFadeTimer = setInterval(() => {
@@ -3179,7 +3014,6 @@
                 if (step >= steps) {
                     clearInterval(_letterMusicFadeTimer);
                     try { bgMusic.pause(); } catch(_) {}
-                    // Fade in nhạc thư
                     letterMusic.currentTime = 0;
                     letterMusic.volume = 0;
                     letterMusic.play().catch(() => {});
@@ -3192,9 +3026,7 @@
                 }
             }, interval);
         }
-        // ════════════════════════════════════════════════════════════════
-        // PASSCODE
-        // ════════════════════════════════════════════════════════════════
+
         const PASSCODE = cfg.passcode || '1009';
         let passcodeInput = '';
 
@@ -3204,13 +3036,10 @@
         const bearLeft = document.getElementById('bearLeft');
         const bearRight = document.getElementById('bearRight');
 
-        // Nếu tắt passcode: ẩn màn hình mật khẩu, khởi động thẳng
         if (!enablePasscode) {
             passcodeScreen.style.display = 'none';
-            // Nhạc sẽ phát khi user giữ nút Start (startHold) – tránh autoplay bị chặn trên mobile
             init();
         } else {
-            // Hiện passcode ngay khi tải trang
             passcodeScreen.classList.add('visible');
         }
 
@@ -3241,7 +3070,6 @@
 
         function openGift() {
             passcodeBears.classList.add('show-couple');
-            // Nhạc chỉ phát khi user giữ nút "Giữ để bắt đầu", không phát khi mở khóa
             setTimeout(() => {
                 passcodeScreen.classList.add('hiding');
                 setTimeout(() => {
@@ -3274,13 +3102,11 @@
             updateBearPosition();
         });
 
-        // Chặn pinch zoom trên passcode
         passcodeScreen.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
 
-        // Listener cho click phong bì lá thư (hoạt động cả khi không có sphere)
         document.getElementById('letter-envelope-img')?.addEventListener('click', handleLetterEnvelopeClick);
 
-        })(); // end async IIFE
+        })(); 
     </script> 
 </body>
 </html>
