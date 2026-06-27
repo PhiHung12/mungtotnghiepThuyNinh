@@ -193,6 +193,18 @@
             from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
             to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
+        @keyframes letterShake {
+            0%   { transform: translate(-50%, -50%) rotate(0deg); }
+            15%  { transform: translate(calc(-50% + 5px), -50%) rotate(0.6deg); }
+            30%  { transform: translate(calc(-50% - 4px), -50%) rotate(-0.5deg); }
+            45%  { transform: translate(calc(-50% + 3px), -50%) rotate(0.4deg); }
+            60%  { transform: translate(calc(-50% - 2px), -50%) rotate(-0.3deg); }
+            75%  { transform: translate(calc(-50% + 1px), -50%) rotate(0.15deg); }
+            100% { transform: translate(-50%, -50%) rotate(0deg); }
+        }
+        #cupid-letter-frame.shaking {
+            animation: cupidLetterFadeIn 0.6s ease-out, letterShake 0.55s ease-in-out 0.5s;
+        }
         /* Thư: giống index copy — PacificoLocal (nếu có @font-face) + Cormorant Garamond + Georgia, không lỗi font iOS */
         #cupid-letter-frame .letter-content {
             position: relative; z-index: 1;
@@ -246,6 +258,84 @@
             text-align: center;
             text-shadow: 0 0 10px rgba(255, 182, 193, 0.6);
         }
+        /* ── Nút điều hướng trang thư ── */
+        #letter-page-nav {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0 4px;
+            position: relative; z-index: 2;
+        }
+        #letter-page-nav.visible { display: flex; }
+        .letter-nav-btn {
+            background: linear-gradient(135deg, #ff69b4, #d84a6f);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 20px;
+            font-size: 14px;
+            font-family: "PacificoLocal", "Cormorant Garamond", Georgia, serif;
+            cursor: pointer;
+            box-shadow: 0 3px 12px rgba(216, 74, 111, 0.4);
+            transition: transform 0.18s, box-shadow 0.18s, opacity 0.18s;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+        .letter-nav-btn:disabled { opacity: 0.3; cursor: default; transform: none !important; }
+        .letter-nav-btn:not(:disabled):active { transform: scale(0.93); }
+        #letter-page-indicator {
+            font-size: 13px;
+            color: #d84a6f;
+            font-family: "PacificoLocal", "Cormorant Garamond", Georgia, serif;
+            min-width: 52px;
+            text-align: center;
+            opacity: 0.8;
+        }
+        /* ── Hiệu ứng flip ảnh ── */
+        #cupid-letter-frame .letter-image-wrap {
+            perspective: 800px;
+        }
+        #cupid-letter-frame .letter-inline-image {
+            cursor: pointer;
+            transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease;
+        }
+        #cupid-letter-frame .letter-inline-image.img-flip-out {
+            transform: rotateY(90deg) scale(0.85);
+            opacity: 0;
+        }
+        #cupid-letter-frame .letter-inline-image.img-flip-in {
+            transform: rotateY(0deg) scale(1);
+            opacity: 1;
+        }
+        /* ── Tap tip bên dưới ảnh ── */
+        .tap-tip {
+            margin-top: 8px;
+            text-align: center;
+            color: #d84a6f;
+            font-size: 13px;
+            font-family: "PacificoLocal", "Cormorant Garamond", Georgia, serif;
+            animation: tapPulse 1.6s ease-in-out infinite;
+            opacity: 0.85;
+        }
+        @keyframes tapPulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+        /* ── Hiệu ứng kết thúc: tim rơi ── */
+        .letter-heart-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            font-size: 22px;
+            animation: heartFall linear forwards;
+        }
+        @keyframes heartFall {
+            0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+            80%  { opacity: 0.8; }
+            100% { transform: translateY(100vh) rotate(360deg) scale(0.4); opacity: 0; }
+        }
         #cupid-letter-frame .letter-content .letter-cursor {
             display: inline-block;
             width: 2px;
@@ -259,6 +349,107 @@
             0%, 50% { opacity: 1; }
             51%, 100% { opacity: 0; }
         }
+        /* ══ NÚT TIM GÓC PHẢI CUỐI THƯ ══ */
+        #letter-heart-close {
+            position: absolute;
+            bottom: clamp(14px, 3vw, 22px);
+            right: clamp(14px, 3vw, 22px);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        #letter-heart-close-hint {
+            font-family: "PacificoLocal", "Cormorant Garamond", Georgia, serif;
+            font-size: 11px;
+            color: #d84a6f;
+            white-space: nowrap;
+            animation: hintPulse 1.8s ease-in-out infinite;
+            text-shadow: 0 0 8px rgba(216,74,111,0.4);
+        }
+        @keyframes hintPulse {
+            0%, 100% { opacity: 0.4; transform: translateY(0); }
+            50%       { opacity: 1;   transform: translateY(-2px); }
+        }
+        #letter-heart-btn {
+            width: clamp(52px, 10vw, 68px);
+            height: clamp(52px, 10vw, 68px);
+            font-size: clamp(28px, 6vw, 40px);
+            border: none;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.85);
+            box-shadow: 0 0 0 3px rgba(255,105,180,0.35),
+                        0 4px 18px rgba(216,74,111,0.35);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.18s, box-shadow 0.18s;
+            animation: heartBtnPop 1.4s ease-in-out infinite;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+        }
+        @keyframes heartBtnPop {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 3px rgba(255,105,180,0.35), 0 4px 18px rgba(216,74,111,0.35); }
+            50%       { transform: scale(1.12); box-shadow: 0 0 0 6px rgba(255,105,180,0.2), 0 6px 24px rgba(216,74,111,0.5); }
+        }
+        #letter-heart-btn:active { transform: scale(0.9) !important; }
+
+        /* ══ CANVAS PHÁO HOA ══ */
+        #fireworks-canvas {
+            position: fixed; inset: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 800;
+            display: none;
+        }
+
+        /* ══ ẢNH BAY LÊN — kiểu Tết giống project tham khảo ══ */
+        .flying-photo-wrapper {
+            position: fixed;
+            top: 100vh;
+            left: 50%;
+            transform: translateX(-50%) translateY(0);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 790;
+        }
+        .flying-photo-wrapper.fw-animate {
+            animation: fwPhotoFloatUp var(--fly-dur, 7s) linear forwards;
+        }
+        /* Chỉ animate "transform", không động tới top/bottom trong keyframes —
+           kết hợp top/bottom với transform trong animation gây lỗi render
+           (ảnh không hiện) trên nhiều trình duyệt. */
+        @keyframes fwPhotoFloatUp {
+            0%   { opacity: 0;   transform: translateX(-50%) translateY(60px); }
+            12%  { opacity: 1; }
+            88%  { opacity: 0.9; }
+            100% { opacity: 0;   transform: translateX(-50%) translateY(calc(-100vh - 220px)); }
+        }
+        .flying-photo {
+            display: block;
+            width: clamp(70px, 15vw, 130px);
+            height: clamp(70px, 15vw, 130px);
+            object-fit: cover;
+            border-radius: clamp(8px, 1.5vw, 14px);
+            border: 3px solid rgba(255, 192, 203, 0.9);
+            box-shadow:
+                0 0 20px rgba(255, 105, 180, 0.8),
+                0 0 40px rgba(255, 20, 147, 0.6),
+                0 0 60px rgba(255, 20, 147, 0.3);
+            animation: fwImageGlow 2s ease-in-out infinite alternate;
+        }
+        @keyframes fwImageGlow {
+            0%   { box-shadow: 0 0 20px rgba(255,105,180,0.8), 0 0 40px rgba(255,20,147,0.6), 0 0 60px rgba(255,20,147,0.3); border-color: rgba(255,192,203,0.9); }
+            100% { box-shadow: 0 0 30px rgba(255,105,180,1), 0 0 60px rgba(255,20,147,0.9), 0 0 90px rgba(255,20,147,0.6); border-color: rgba(255,255,255,1); }
+        }
+        @media (max-width: 768px) {
+            .flying-photo { width: 80px; height: 80px; border-width: 2px; }
+        }
+        @media (max-width: 480px) {
+            .flying-photo { width: 60px; height: 60px; border-width: 2px; border-radius: 8px; }
+        }
+        /* ── Chữ ký ── */
         .letter-signature {
             position: absolute;
             right: clamp(16px, 4vw, 32px);
@@ -477,13 +668,25 @@
             <div class="letter-bottom-bg"></div>
             <div class="letter-content"></div>
             <div class="letter-image-wrap" id="letterImageWrap" style="display:none">
-                <img class="letter-inline-image" id="letterInlineImage" src="index.html" alt="">
+                <img class="letter-inline-image" id="letterInlineImage" src="" alt="">
                 <span class="letter-image-caption">♥</span>
+                <div class="tap-tip" id="letterTapTip">📸 Chạm để xem ảnh tiếp theo</div>
+            </div>
+            <div id="letter-page-nav">
+                <button type="button" class="letter-nav-btn" id="letterPrevBtn">◀ Trước</button>
+                <span id="letter-page-indicator">1 / 1</span>
+                <button type="button" class="letter-nav-btn" id="letterNextBtn">Tiếp ▶</button>
+            </div>
+            <!-- Nút tim góc phải cuối thư -->
+            <div id="letter-heart-close" style="display:none">
+                <div id="letter-heart-close-hint">Chạm vào đây để kết thúc ✨</div>
+                <button type="button" id="letter-heart-btn" aria-label="Kết thúc">❤️</button>
             </div>
         </div>
     </div>
 
     <canvas id="webglCanvas"></canvas>
+    <canvas id="fireworks-canvas"></canvas>
 
     <!-- Bảo vệ DevTools -->
     <!-- <script src="detect-devtools.js"></script> -->
@@ -535,14 +738,30 @@
 
         // ── Nội dung lá thư ─────────────────────────────────────────────
         letter: {
-            text: "Chứt mừn\n\n Chúc Ninh vui vẻ và hạnh phúc và blabla :3.",
-            image: 'assets/1.png',
-            caption: '♥'
+            pages: [
+                {
+                    text: "Chứt mừn Thùy Ninh!\n\nHôm nay là ngày đặc biệt của em — chúc em luôn xinh đẹp, rạng rỡ và hạnh phúc mỗi ngày nhé 🌸",
+                    image: 'assets/1.png',
+                    caption: '♥'
+                },
+                {
+                    text: "Em đã cố gắng rất nhiều và xứng đáng được nhận mọi điều tuyệt vời nhất.\n\nChúc mừng em đã tốt nghiệp! 🎓",
+                    image: 'assets/2.png',
+                    caption: '✨'
+                },
+                {
+                    text: "Cảm ơn em đã luôn là chính mình — dịu dàng, mạnh mẽ và đáng yêu theo cách của riêng em.\n\nMãi yêu em! ❤️",
+                    image: 'assets/images/1.jpg',
+                    caption: '🌹'
+                }
+            ]
         },
 
         // ── Nhạc nền ────────────────────────────────────────────────────
-        bgMusic:  'assets/music/em.mp3',
-        bgVolume: 0.55
+        bgMusic:      'assets/music/em.mp3',
+        bgVolume:     0.55,
+        letterMusic:  'assets/music/em2.mp3',   // nhạc phát khi mở thư
+        letterVolume: 0.65
     };
 
     // Chuẩn hóa luồng lấy config:
@@ -1603,7 +1822,29 @@
         let cupidLetterState = 'hidden';
         let cupidFlyStartTime = 0;
         const CUPID_FLY_DURATION_MS = 2000;
-        const CUPID_LETTER_TEXT = (cfg.letter && cfg.letter.text) ? cfg.letter.text : "Happy Women's Day!\n\nEm iu, chúc em luôn xinh đẹp và hạnh phúc.";
+
+        // ── Hỗ trợ nhiều trang thư ──────────────────────────────────────
+        // Chuẩn hóa cfg.letter thành mảng pages
+        let LETTER_PAGES = [];
+        if (cfg.letter) {
+            if (Array.isArray(cfg.letter.pages) && cfg.letter.pages.length > 0) {
+                LETTER_PAGES = cfg.letter.pages;
+            } else {
+                // Tương thích ngược: cấu trúc cũ {text, image, caption}
+                LETTER_PAGES = [{
+                    text:    cfg.letter.text    || "Happy Women's Day!",
+                    image:   cfg.letter.image   || '',
+                    caption: cfg.letter.caption || '♥'
+                }];
+            }
+        } else {
+            LETTER_PAGES = [{ text: "Happy Women's Day!", image: '', caption: '♥' }];
+        }
+        let currentLetterPage = 0;
+        let isTyping = false;
+
+        // Dùng CUPID_LETTER_TEXT cho trang hiện tại (tương thích cũ)
+        const CUPID_LETTER_TEXT = LETTER_PAGES[0].text;
 
         function spRandOnSphere(r) {
             const t = Math.random() * Math.PI * 2, p = Math.acos(2 * Math.random() - 1);
@@ -1836,11 +2077,13 @@
         }
 
         function startLetterTypingEffect(letterContent, cursor) {
-            const text = CUPID_LETTER_TEXT;
+            const page = LETTER_PAGES[currentLetterPage] || LETTER_PAGES[0];
+            const text = page.text || '';
             const TYPING_SPEED_MS = 50;
             const NEWLINE_DELAY_MS = 5 * TYPING_SPEED_MS;
             const chars = Array.from(text);
             let currentIndex = 0;
+            isTyping = true;
             function typeNextChar() {
                 if (currentIndex < chars.length) {
                     const char = chars[currentIndex];
@@ -1855,62 +2098,758 @@
                     const delay = char === '\n' ? NEWLINE_DELAY_MS : TYPING_SPEED_MS;
                     setTimeout(typeNextChar, delay);
                 } else {
+                    isTyping = false;
                     setTimeout(() => {
                         if (cursor) cursor.style.display = 'none';
                         letterContent.classList.add('typing-complete');
-                        const letterImageUrl = (cfg.letter && cfg.letter.image && String(cfg.letter.image).trim()) ? cfg.letter.image : '';
-                        const captionText = (cfg.letter && cfg.letter.caption != null) ? String(cfg.letter.caption).trim() : '';
-                        const wrap = document.getElementById('letterImageWrap');
-                        const imgEl = document.getElementById('letterInlineImage');
-                        const captionEl = wrap?.querySelector('.letter-image-caption');
-                        if (wrap) {
-                            if (letterImageUrl && imgEl) {
-                                imgEl.src = letterImageUrl;
-                                imgEl.style.display = 'block';
-                            } else if (imgEl) {
-                                imgEl.style.display = 'none';
-                            }
-                            if (captionEl) {
-                                captionEl.textContent = captionText || '';
-                                captionEl.style.display = captionText ? 'block' : 'none';
-                            }
-                            if (letterImageUrl || captionText) {
-                                wrap.style.display = 'block';
-                                wrap.classList.remove('visible');
-                                requestAnimationFrame(() => { wrap.classList.add('visible'); });
-                            }
-                        }
+                        // Hiện ảnh của trang này
+                        showLetterPageImage(page);
+                        // Hiện nav nếu có nhiều trang
+                        updateLetterNav();
                     }, 400);
                 }
             }
             setTimeout(typeNextChar, 300);
         }
 
+        function showLetterPageImage(page) {
+            const letterImageUrl = (page && page.image && String(page.image).trim()) ? page.image : '';
+            const captionText    = (page && page.caption != null) ? String(page.caption).trim() : '';
+            const wrap     = document.getElementById('letterImageWrap');
+            const imgEl    = document.getElementById('letterInlineImage');
+            const captionEl = wrap?.querySelector('.letter-image-caption');
+            const tapTip   = document.getElementById('letterTapTip');
+            if (!wrap) return;
+            if (letterImageUrl && imgEl) {
+                imgEl.src = letterImageUrl;
+                imgEl.style.display = 'block';
+            } else if (imgEl) {
+                imgEl.style.display = 'none';
+            }
+            if (captionEl) {
+                captionEl.textContent = captionText || '';
+                captionEl.style.display = captionText ? 'block' : 'none';
+            }
+            // Ẩn tap tip nếu là trang cuối
+            if (tapTip) {
+                tapTip.style.display = (currentLetterPage < LETTER_PAGES.length - 1) ? 'block' : 'none';
+            }
+            if (letterImageUrl || captionText) {
+                wrap.style.display = 'block';
+                wrap.classList.remove('visible');
+                requestAnimationFrame(() => { wrap.classList.add('visible'); });
+            } else {
+                wrap.style.display = 'none';
+            }
+        }
+
+        function updateLetterNav() {
+            const nav = document.getElementById('letter-page-nav');
+            const prevBtn = document.getElementById('letterPrevBtn');
+            const nextBtn = document.getElementById('letterNextBtn');
+            const indicator = document.getElementById('letter-page-indicator');
+            const heartClose = document.getElementById('letter-heart-close');
+            if (!nav) return;
+            if (LETTER_PAGES.length <= 1) { nav.classList.remove('visible'); return; }
+            nav.classList.add('visible');
+            if (indicator) indicator.textContent = `${currentLetterPage + 1} / ${LETTER_PAGES.length}`;
+            if (prevBtn) prevBtn.disabled = (currentLetterPage === 0);
+            if (nextBtn) nextBtn.disabled = (currentLetterPage === LETTER_PAGES.length - 1);
+            // Trang cuối: hiện nút tim, bắn tim rơi
+            const isLastPage = currentLetterPage === LETTER_PAGES.length - 1;
+            if (heartClose) heartClose.style.display = isLastPage ? 'flex' : 'none';
+            if (isLastPage) {
+                setTimeout(spawnHeartParticles, 400);
+                // Gắn sự kiện nút tim (1 lần)
+                const heartBtn = document.getElementById('letter-heart-btn');
+                if (heartBtn && !heartBtn.dataset.bound) {
+                    heartBtn.dataset.bound = '1';
+                    heartBtn.addEventListener('click', onHeartCloseClick);
+                }
+            }
+        }
+
+        // ══ ĐÓNG THƯ → ẢNH BAY + PHÁO HOA ══
+        function onHeartCloseClick() {
+            // 1. Đóng khung thư
+            const overlay = document.getElementById('cupid-letter-overlay');
+            const frame   = document.getElementById('cupid-letter-frame');
+            if (frame)   { frame.style.transition = 'opacity 0.5s ease'; frame.style.opacity = '0'; setTimeout(() => { frame.classList.remove('visible'); frame.style.opacity = ''; frame.style.transition = ''; }, 500); }
+            if (overlay) { setTimeout(() => overlay.classList.remove('visible'), 500); }
+
+            // 2. Bắt đầu ảnh bay + pháo hoa sau khi thư tắt
+            setTimeout(() => {
+                launchFlyingPhotos();
+                startFireworks();
+            }, 550);
+        }
+
+        function launchFlyingPhotos() {
+            const images = (cfg.sphereImages && cfg.sphereImages.length) ? cfg.sphereImages
+                         : (cfg.letter && cfg.letter.pages ? cfg.letter.pages.map(p => p.image).filter(Boolean) : []);
+            if (!images.length) return;
+
+            const count   = Math.min(images.length, 9);
+            const picked  = [...images].sort(() => Math.random() - 0.5).slice(0, count);
+            const W = window.innerWidth;
+
+            picked.forEach((src, i) => {
+                // wrapper chịu trách nhiệm vị trí ngang + animation bay
+                const wrapper = document.createElement('div');
+                wrapper.className = 'flying-photo-wrapper';
+
+                // vị trí ngang rải đều
+                const slotW = 100 / count;
+                const leftPct = slotW * i + slotW * 0.1 + Math.random() * slotW * 0.6;
+                wrapper.style.left = Math.min(Math.max(5, leftPct), 92) + '%';
+
+                const dur   = 6 + Math.random() * 4;
+                const delay = i * 0.18 + Math.random() * 0.2;
+                wrapper.style.setProperty('--fly-dur', dur + 's');
+
+                // img bên trong — glow hồng
+                const el = document.createElement('img');
+                el.className = 'flying-photo';
+                el.src = src;
+                el.alt = '';
+
+                wrapper.appendChild(el);
+                document.body.appendChild(wrapper);
+
+                // Kích hoạt animation sau delay
+                setTimeout(() => {
+                    wrapper.classList.add('fw-animate');
+                }, delay * 1000);
+
+                setTimeout(() => wrapper.remove(), (dur + delay + 0.5) * 1000);
+            });
+        }
+
+        function clamp(min, val, max) { return Math.max(min, Math.min(max, val)); }
+
+        // ══ PHÁO HOA VẬT LÝ — Port từ project chucmungnammoi ══
+        let fwRAF = null;
+        let fwAudioCtx = null;
+        let fwRunning = false;
+
+        function startFireworks() {
+            const canvas = document.getElementById('fireworks-canvas');
+            if (!canvas) return;
+            canvas.width  = window.innerWidth;
+            canvas.height = window.innerHeight;
+            canvas.style.display = 'block';
+            fwRunning = true;
+
+            // ── Khởi tạo Web Audio ──
+            try {
+                const AC = window.AudioContext || window.webkitAudioContext;
+                if (AC && !fwAudioCtx) fwAudioCtx = new AC();
+            } catch(e) {}
+
+            // ── Âm thanh: lift (vút) + burst (nổ) ──
+            function playLift() {
+                if (!fwAudioCtx) return;
+                try {
+                    const dur = 0.6;
+                    const osc = fwAudioCtx.createOscillator();
+                    const filter = fwAudioCtx.createBiquadFilter();
+                    const gain = fwAudioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(70, fwAudioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(220, fwAudioCtx.currentTime + dur * 0.85);
+                    filter.type = 'lowpass';
+                    filter.frequency.value = 900;
+                    gain.gain.setValueAtTime(0.001, fwAudioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.05, fwAudioCtx.currentTime + 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.001, fwAudioCtx.currentTime + dur);
+                    osc.connect(filter); filter.connect(gain); gain.connect(fwAudioCtx.destination);
+                    osc.start(); osc.stop(fwAudioCtx.currentTime + dur);
+                } catch(e) {}
+            }
+
+            function playBurst(scale) {
+                if (!fwAudioCtx) return;
+                try {
+                    const dur = 1.1, sr = fwAudioCtx.sampleRate;
+                    const buf = fwAudioCtx.createBuffer(1, sr * dur, sr);
+                    const d = buf.getChannelData(0);
+                    for (let i = 0; i < d.length; i++) {
+                        const t = i / sr;
+                        d[i] = Math.exp(-t * 9)  * (Math.random() * 2 - 1) * 0.6
+                              + Math.exp(-t * 3)  * (Math.random() * 2 - 1) * 0.25;
+                    }
+                    const src = fwAudioCtx.createBufferSource();
+                    src.buffer = buf;
+                    const filter = fwAudioCtx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.value = 1400;
+                    const comp = fwAudioCtx.createDynamicsCompressor();
+                    comp.threshold.value = -18; comp.ratio.value = 4;
+                    comp.attack.value = 0.003; comp.release.value = 0.3;
+                    const gain = fwAudioCtx.createGain();
+                    const vol = (scale || 1) * 0.28;
+                    gain.gain.setValueAtTime(vol, fwAudioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, fwAudioCtx.currentTime + dur);
+                    src.connect(filter); filter.connect(comp); comp.connect(gain); gain.connect(fwAudioCtx.destination);
+                    src.start();
+                } catch(e) {}
+            }
+
+            // ── Màu sắc pháo hoa Tết ──
+            const COLORS = {
+                Red: '#ff0043', Green: '#14fc56', Blue: '#1e7fff',
+                Purple: '#e60aff', Gold: '#ffbf36', White: '#ffffff',
+            };
+            const COLOR_LIST = Object.values(COLORS);
+            function randColor() { return COLOR_LIST[(Math.random() * COLOR_LIST.length) | 0]; }
+            function whiteOrGold() { return Math.random() < 0.5 ? COLORS.Gold : COLORS.White; }
+
+            // ── Star pool ──
+            const activeStar = {}; // color → []
+            const starPool = [];
+            COLOR_LIST.forEach(c => activeStar[c] = []);
+
+            function addStar(x, y, color, angle, speed, life, vx0, vy0) {
+                const s = starPool.pop() || {};
+                s.x = x; s.y = y; s.prevX = x; s.prevY = y;
+                s.color = color;
+                s.speedX = Math.sin(angle) * speed + (vx0 || 0);
+                s.speedY = Math.cos(angle) * speed + (vy0 || 0);
+                s.life = life; s.fullLife = life;
+                s.size = 3;
+                s.sparkFreq = 0; s.sparkTimer = 0; s.sparkSpeed = 1;
+                s.sparkLife = 750; s.sparkColor = color;
+                s.heavy = false;
+                s.secondColor = null; s.transitionTime = 0; s.colorChanged = false;
+                s.onDeath = null; s.visible = true;
+                if (!activeStar[color]) activeStar[color] = [];
+                activeStar[color].push(s);
+                return s;
+            }
+
+            // ── Spark pool ──
+            const activeSpark = {};
+            const sparkPool = [];
+            COLOR_LIST.forEach(c => activeSpark[c] = []);
+
+            function addSpark(x, y, color, angle, speed, life) {
+                const s = sparkPool.pop() || {};
+                s.x = x; s.y = y; s.prevX = x; s.prevY = y;
+                s.color = color;
+                s.speedX = Math.sin(angle) * speed;
+                s.speedY = Math.cos(angle) * speed;
+                s.life = life;
+                if (!activeSpark[color]) activeSpark[color] = [];
+                activeSpark[color].push(s);
+                return s;
+            }
+
+            // ── BurstFlash ──
+            const burstFlashes = [];
+            function addBurstFlash(x, y, r) { burstFlashes.push({ x, y, r }); }
+
+            // ── Tạo vụ nổ tròn ──
+            const PI2 = Math.PI * 2;
+            function createBurst(count, factory) {
+                const R = 0.5 * Math.sqrt(count / Math.PI);
+                const C = 2 * R * Math.PI;
+                const CH = C / 2;
+                for (let i = 0; i <= CH; i++) {
+                    const ra = (i / CH) * (Math.PI * 0.5);
+                    const rs = Math.cos(ra);
+                    const ppr = C * rs;
+                    const ai = PI2 / ppr;
+                    const ao = Math.random() * ai;
+                    for (let j = 0; j < ppr; j++) {
+                        factory(ai * j + ao + Math.random() * ai * 0.33, rs);
+                    }
+                }
+            }
+
+            // ── Shell types ──
+            function shellCrysanthemum(size) {
+                const color = randColor();
+                const glitter = Math.random() < 0.25;
+                const pistil = Math.random() < 0.42;
+                const pistilColor = pistil ? whiteOrGold() : null;
+                const streamers = !pistil && Math.random() < 0.42;
+                return {
+                    shellSize: size,
+                    spreadSize: 300 + size * 100,
+                    starLife: 900 + size * 200,
+                    starDensity: glitter ? 1.1 : 1.25,
+                    color, pistil, pistilColor, streamers,
+                    glitter: glitter ? 'light' : '',
+                    glitterColor: whiteOrGold(),
+                };
+            }
+
+            function shellPalm(size) {
+                const color = randColor();
+                const thick = Math.random() < 0.5;
+                return {
+                    shellSize: size, color,
+                    spreadSize: 250 + size * 75,
+                    starDensity: thick ? 0.15 : 0.4,
+                    starLife: 1800 + size * 200,
+                    glitter: thick ? 'thick' : 'heavy',
+                    glitterColor: whiteOrGold(),
+                };
+            }
+
+            function shellRing(size) {
+                const color = randColor();
+                const pistil = Math.random() < 0.75;
+                return {
+                    shellSize: size, ring: true, color,
+                    spreadSize: 300 + size * 100,
+                    starLife: 900 + size * 200,
+                    starCount: 2.2 * PI2 * (size + 1),
+                    pistil, pistilColor: whiteOrGold(),
+                    glitter: !pistil ? 'light' : '',
+                    glitterColor: color === COLORS.Gold ? COLORS.Gold : COLORS.White,
+                };
+            }
+
+            function shellWillow(size) {
+                return {
+                    shellSize: size,
+                    spreadSize: 300 + size * 100,
+                    starDensity: 0.6,
+                    starLife: 3000 + size * 300,
+                    glitter: 'willow',
+                    glitterColor: COLORS.Gold,
+                    color: '_INVISIBLE_',
+                };
+            }
+
+            const shellTypes = [shellCrysanthemum, shellPalm, shellRing, shellWillow];
+
+            // ── Shell burst logic ──
+            function burstShell(opts, x, y) {
+                const speed = opts.spreadSize / 96;
+                const stdInitY = -opts.spreadSize / 1800;
+                let starCount = opts.starCount || Math.max(6, Math.pow(opts.spreadSize / 54, 2) * (opts.starDensity || 1));
+                const color = opts.color;
+                let sparkFreq, sparkSpeed, sparkLife;
+                const glitter = opts.glitter;
+                if (glitter === 'light')   { sparkFreq = 400; sparkSpeed = 0.3;  sparkLife = 300; }
+                else if (glitter === 'medium') { sparkFreq = 200; sparkSpeed = 0.44; sparkLife = 700; }
+                else if (glitter === 'heavy')  { sparkFreq = 80;  sparkSpeed = 0.8;  sparkLife = 1400; }
+                else if (glitter === 'thick')  { sparkFreq = 16;  sparkSpeed = 1.65; sparkLife = 1400; }
+                else if (glitter === 'willow') { sparkFreq = 120; sparkSpeed = 0.34; sparkLife = 1400; }
+
+                const starLife = opts.starLife || 900;
+
+                function starFactory(angle, speedMult) {
+                    const c = color === '_INVISIBLE_' ? COLORS.Gold : (color || randColor());
+                    const star = addStar(x, y, c, angle, speedMult * speed,
+                        starLife + Math.random() * starLife * 0.125, 0, stdInitY);
+                    if (glitter && sparkFreq) {
+                        star.sparkFreq = sparkFreq;
+                        star.sparkSpeed = sparkSpeed;
+                        star.sparkLife = sparkLife;
+                        star.sparkColor = opts.glitterColor || c;
+                        star.sparkTimer = Math.random() * sparkFreq;
+                    }
+                    if (opts.secondColor) {
+                        star.secondColor = opts.secondColor;
+                        star.transitionTime = starLife * (Math.random() * 0.05 + 0.32);
+                    }
+                }
+
+                if (opts.ring) {
+                    const ringAngle = Math.random() * Math.PI;
+                    const squash = Math.pow(Math.random(), 2) * 0.85 + 0.15;
+                    const cnt = opts.starCount || 40;
+                    for (let i = 0; i < cnt; i++) {
+                        const a = (PI2 * i / cnt);
+                        const sx = Math.sin(a) * speed * squash;
+                        const sy = Math.cos(a) * speed;
+                        const ns = Math.hypot(sx, sy);
+                        const na = Math.atan2(sx, sy) + ringAngle;
+                        const st = addStar(x, y, color || randColor(), na, ns,
+                            starLife + Math.random() * starLife * 0.125);
+                        if (glitter && sparkFreq) {
+                            st.sparkFreq = sparkFreq; st.sparkSpeed = sparkSpeed;
+                            st.sparkLife = sparkLife; st.sparkColor = opts.glitterColor || color;
+                            st.sparkTimer = Math.random() * sparkFreq;
+                        }
+                    }
+                } else {
+                    createBurst(starCount, starFactory);
+                }
+
+                // Pistil
+                if (opts.pistil && opts.pistilColor) {
+                    burstShell({
+                        spreadSize: opts.spreadSize * 0.5,
+                        starLife: starLife * 0.6,
+                        starDensity: 1.4,
+                        color: opts.pistilColor,
+                        glitter: 'light',
+                        glitterColor: opts.pistilColor === COLORS.Gold ? COLORS.Gold : COLORS.White,
+                    }, x, y);
+                }
+
+                addBurstFlash(x, y, opts.spreadSize / 4);
+            }
+
+            // ── Shell launch (rocket → burst) ──
+            const rockets = [];
+
+            function launchShell(posX, heightFrac) {
+                const W = canvas.width, H = canvas.height;
+                const hpad = 60, vpad = 50;
+                const minHeight = H - H * 0.45;
+                const lx = posX * (W - hpad * 2) + hpad;
+                const ly = H;
+                const burstY = minHeight - heightFrac * (minHeight - vpad);
+                const vel = Math.pow((ly - burstY) * 0.04, 0.64);
+
+                // Chọn loại shell ngẫu nhiên + kích thước
+                const baseSize = 2 + Math.random() * 1.5;
+                const shellFn = shellTypes[(Math.random() * shellTypes.length) | 0];
+                const opts = shellFn(baseSize);
+
+                rockets.push({
+                    x: lx, y: ly,
+                    targetX: lx + (Math.random() - 0.5) * 40,
+                    targetY: burstY,
+                    speedX: (Math.random() - 0.5) * 0.8,
+                    speedY: -vel * 12,
+                    trail: [],
+                    opts,
+                    dead: false,
+                });
+                playLift();
+            }
+
+            // ── Lịch bắn — SIÊU NHIỀU pháo hoa, nhịp bắn CHẬM hơn (giãn cách dài hơn) ──
+            const W = canvas.width, H = canvas.height;
+            const schedule = [];
+            let _t = 0;
+            const SHELL_TOTAL = 38; // nhiều quả hơn hẳn so với trước (24 quả)
+            for (let i = 0; i < SHELL_TOTAL; i++) {
+                const x = 0.12 + Math.random() * 0.76;
+                const h = 0.55 + Math.random() * 0.35;
+                schedule.push({ t: _t, x, h });
+                // ~28% số lần bắn thêm 1 quả phụ cùng lúc cho cảm giác rộn ràng,
+                // nhưng nhịp CHÍNH vẫn chậm vì khoảng cách giữa các lần bắn được kéo dài ở dưới
+                if (Math.random() < 0.28) {
+                    const x2 = clamp(0.08, x + (Math.random() - 0.5) * 0.35, 0.92);
+                    schedule.push({ t: _t, x: x2, h: 0.5 + Math.random() * 0.4 });
+                }
+                _t += 750 + Math.random() * 550; // chậm hơn: cách nhau 750–1300ms (trước chỉ 400–600ms)
+            }
+
+            schedule.forEach(({ t, x, h }) => {
+                setTimeout(() => {
+                    if (!fwRunning) return;
+                    launchShell(x + (Math.random() - 0.5) * 0.07, h);
+                }, t);
+            });
+
+            // ── Render loop ──
+            const trailCanvas = document.createElement('canvas');
+            trailCanvas.width = canvas.width;
+            trailCanvas.height = canvas.height;
+            const trailCtx = trailCanvas.getContext('2d');
+            const mainCtx = canvas.getContext('2d');
+
+            const GRAVITY = 0.9;
+            let lastTime = null;
+            const TOTAL_MS = _t + 3000; // khớp với lịch bắn mới (đã kéo dài), +3s cho quả cuối nổ và tàn
+            const startMs = Date.now();
+
+            function fwTick(now) {
+                if (!fwRunning) return;
+                const frameTime = lastTime ? Math.min(now - lastTime, 50) : 16.7;
+                lastTime = now;
+                const timeStep = frameTime;
+                const speed = frameTime / 16.7;
+                const gAcc = (timeStep / 1000) * GRAVITY;
+                const starDrag = 1 - (1 - 0.98) * speed;
+                const sparkDrag = 1 - (1 - 0.9) * speed;
+
+                // Trails fade
+                trailCtx.globalCompositeOperation = 'source-over';
+                trailCtx.fillStyle = `rgba(0,0,0,${0.175 * speed})`;
+                trailCtx.fillRect(0, 0, canvas.width, canvas.height);
+                mainCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // ── Rockets ──
+                for (let i = rockets.length - 1; i >= 0; i--) {
+                    const r = rockets[i];
+                    if (r.dead) { rockets.splice(i, 1); continue; }
+                    r.trail.push({ x: r.x, y: r.y });
+                    if (r.trail.length > 12) r.trail.shift();
+                    r.x += r.speedX * speed;
+                    r.y += r.speedY * speed;
+                    r.speedY += gAcc * 0.6; // nhẹ hơn star để bay cao hơn
+
+                    // Đến đích hay đổi chiều (bắt đầu rơi) → nổ
+                    if (r.y <= r.targetY || r.speedY >= 0) {
+                        r.dead = true;
+                        burstShell(r.opts, r.x, r.y);
+                        playBurst(0.85 + Math.random() * 0.15);
+                    }
+
+                    // Vẽ trail rocket
+                    trailCtx.globalCompositeOperation = 'lighten';
+                    for (let ti = 0; ti < r.trail.length - 1; ti++) {
+                        const a = (ti / r.trail.length) * 0.7;
+                        const pt = r.trail[ti];
+                        trailCtx.lineWidth = 2 * (ti / r.trail.length);
+                        trailCtx.strokeStyle = ti > r.trail.length * 0.6 ? COLORS.Gold : '#FF6600';
+                        trailCtx.globalAlpha = a;
+                        trailCtx.beginPath();
+                        trailCtx.moveTo(pt.x, pt.y);
+                        trailCtx.lineTo(r.trail[ti + 1].x, r.trail[ti + 1].y);
+                        trailCtx.stroke();
+                    }
+                    trailCtx.globalAlpha = 1;
+                    // Đầu rocket
+                    mainCtx.beginPath();
+                    mainCtx.arc(r.x, r.y, 2, 0, PI2);
+                    mainCtx.fillStyle = '#ffffff';
+                    mainCtx.globalAlpha = 1;
+                    mainCtx.fill();
+                }
+
+                // ── BurstFlash ──
+                for (let i = burstFlashes.length - 1; i >= 0; i--) {
+                    const bf = burstFlashes[i];
+                    const grad = trailCtx.createRadialGradient(bf.x, bf.y, 0, bf.x, bf.y, bf.r);
+                    grad.addColorStop(0.024, 'rgba(255,255,255,1)');
+                    grad.addColorStop(0.125, 'rgba(255,160,20,0.2)');
+                    grad.addColorStop(0.32,  'rgba(255,140,20,0.11)');
+                    grad.addColorStop(1,     'rgba(255,120,20,0)');
+                    trailCtx.globalCompositeOperation = 'source-over';
+                    trailCtx.fillStyle = grad;
+                    trailCtx.fillRect(bf.x - bf.r, bf.y - bf.r, bf.r * 2, bf.r * 2);
+                    burstFlashes.splice(i, 1);
+                }
+
+                // ── Stars ──
+                trailCtx.globalCompositeOperation = 'lighten';
+                trailCtx.lineWidth = 3;
+                trailCtx.lineCap = 'round';
+                mainCtx.strokeStyle = '#fff';
+                mainCtx.lineWidth = 1;
+
+                let totalActive = rockets.length;
+                COLOR_LIST.forEach(color => {
+                    const stars = activeStar[color] || [];
+                    totalActive += stars.length;
+                    trailCtx.strokeStyle = color;
+                    trailCtx.beginPath();
+                    for (let i = stars.length - 1; i >= 0; i--) {
+                        const s = stars[i];
+                        s.life -= timeStep;
+                        if (s.life <= 0) {
+                            if (s.onDeath) s.onDeath(s);
+                            stars.splice(i, 1);
+                            starPool.push(s);
+                            continue;
+                        }
+                        s.prevX = s.x; s.prevY = s.y;
+                        s.x += s.speedX * speed;
+                        s.y += s.speedY * speed;
+                        s.speedX *= starDrag;
+                        s.speedY *= starDrag;
+                        s.speedY += gAcc;
+
+                        // Secondcolor transition (invisible stars)
+                        if (s.secondColor && s.life < s.transitionTime && !s.colorChanged) {
+                            s.colorChanged = true;
+                            stars.splice(i, 1);
+                            s.color = s.secondColor;
+                            if (!activeStar[s.color]) activeStar[s.color] = [];
+                            activeStar[s.color].push(s);
+                            continue;
+                        }
+
+                        // Sparks
+                        if (s.sparkFreq) {
+                            s.sparkTimer -= timeStep;
+                            const burnRate = Math.pow(s.life / s.fullLife, 0.5);
+                            while (s.sparkTimer < 0) {
+                                s.sparkTimer += s.sparkFreq;
+                                addSpark(s.x, s.y, s.sparkColor,
+                                    Math.random() * PI2,
+                                    Math.random() * s.sparkSpeed * burnRate,
+                                    s.sparkLife * 0.8 + Math.random() * s.sparkLife * 0.5);
+                            }
+                        }
+
+                        if (s.visible) {
+                            trailCtx.moveTo(s.x, s.y);
+                            trailCtx.lineTo(s.prevX, s.prevY);
+                        }
+                    }
+                    trailCtx.stroke();
+                });
+
+                // ── Sparks ──
+                trailCtx.lineWidth = 0.75;
+                trailCtx.lineCap = 'butt';
+                COLOR_LIST.forEach(color => {
+                    const sparks = activeSpark[color] || [];
+                    totalActive += sparks.length;
+                    trailCtx.strokeStyle = color;
+                    trailCtx.beginPath();
+                    for (let i = sparks.length - 1; i >= 0; i--) {
+                        const s = sparks[i];
+                        s.life -= timeStep;
+                        if (s.life <= 0) { sparks.splice(i, 1); sparkPool.push(s); continue; }
+                        s.prevX = s.x; s.prevY = s.y;
+                        s.x += s.speedX * speed;
+                        s.y += s.speedY * speed;
+                        s.speedX *= sparkDrag;
+                        s.speedY *= sparkDrag;
+                        s.speedY += gAcc;
+                        trailCtx.moveTo(s.x, s.y);
+                        trailCtx.lineTo(s.prevX, s.prevY);
+                    }
+                    trailCtx.stroke();
+                });
+
+                // Vẽ trails + main lên canvas chính
+                mainCtx.globalAlpha = 1;
+                mainCtx.globalCompositeOperation = 'source-over';
+                mainCtx.drawImage(trailCanvas, 0, 0);
+
+                const elapsed = Date.now() - startMs;
+                if (elapsed < TOTAL_MS || totalActive > 0) {
+                    fwRAF = requestAnimationFrame(fwTick);
+                } else {
+                    // Fade out canvas
+                    fwRunning = false;
+                    let alpha = 1;
+                    const fadeOut = setInterval(() => {
+                        alpha -= 0.05;
+                        canvas.style.opacity = Math.max(0, alpha);
+                        if (alpha <= 0) {
+                            clearInterval(fadeOut);
+                            canvas.style.display = 'none';
+                            canvas.style.opacity = '';
+                            mainCtx.clearRect(0, 0, canvas.width, canvas.height);
+                        }
+                    }, 40);
+                }
+            }
+
+            if (fwRAF) { cancelAnimationFrame(fwRAF); }
+            fwRAF = requestAnimationFrame(fwTick);
+        }
+
+        function goToLetterPage(dir) {
+            if (isTyping) return;
+            const next = currentLetterPage + dir;
+            if (next < 0 || next >= LETTER_PAGES.length) return;
+            const letterFrame   = document.getElementById('cupid-letter-frame');
+            const letterContent = letterFrame?.querySelector('.letter-content');
+            const imgEl         = document.getElementById('letterInlineImage');
+            const wrap          = document.getElementById('letterImageWrap');
+            if (!letterContent) return;
+            // Flip ảnh ra
+            if (imgEl && wrap && wrap.style.display !== 'none') {
+                imgEl.classList.add('img-flip-out');
+                setTimeout(() => {
+                    imgEl.classList.remove('img-flip-out');
+                    imgEl.classList.add('img-flip-in');
+                    setTimeout(() => imgEl.classList.remove('img-flip-in'), 350);
+                }, 300);
+            }
+            // Fade nội dung thư
+            letterContent.style.transition = 'opacity 0.25s ease';
+            letterContent.style.opacity = '0';
+            setTimeout(() => {
+                currentLetterPage = next;
+                letterContent.textContent = '';
+                letterContent.classList.remove('typing-complete');
+                letterContent.style.opacity = '1';
+                // Ẩn ảnh trước khi gõ
+                if (wrap) { wrap.style.display = 'none'; wrap.classList.remove('visible'); }
+                if (imgEl) { imgEl.src = ''; }
+                const cursor = document.createElement('span');
+                cursor.className = 'letter-cursor';
+                letterContent.appendChild(cursor);
+                startLetterTypingEffect(letterContent, cursor);
+            }, 300);
+        }
+
+        function spawnHeartParticles() {
+            const hearts = ['❤️','💕','💗','💖','🌸','✨'];
+            for (let i = 0; i < 22; i++) {
+                setTimeout(() => {
+                    const el = document.createElement('div');
+                    el.className = 'letter-heart-particle';
+                    el.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                    el.style.left = (10 + Math.random() * 80) + 'vw';
+                    el.style.top  = (-30 + Math.random() * 20) + 'px';
+                    el.style.fontSize = (16 + Math.random() * 18) + 'px';
+                    el.style.animationDuration = (2.5 + Math.random() * 2) + 's';
+                    el.style.animationDelay = (Math.random() * 0.5) + 's';
+                    document.body.appendChild(el);
+                    setTimeout(() => el.remove(), 5500);
+                }, i * 90);
+            }
+        }
+
         function handleLetterEnvelopeClick() {
             if (cupidLetterState !== 'letterImage') return;
             cupidLetterState = 'showingLetter';
+            currentLetterPage = 0;
+            isTyping = false;
             // Khi không có nút ấn giữ (không hiệu ứng hạt), phát nhạc lần đầu khi ấn vào lá thư
             if (typeof startBgMusic === 'function') {
                 try { startBgMusic(); } catch (_) {}
             }
+            // Chuyển sang nhạc thư (fade mượt)
+            switchToLetterMusic();
             document.getElementById('letter-envelope-img')?.classList.remove('visible');
             const letterFrame = document.getElementById('cupid-letter-frame');
             const letterContent = letterFrame?.querySelector('.letter-content');
             const letterImageWrap = document.getElementById('letterImageWrap');
             const letterInlineImage = document.getElementById('letterInlineImage');
+            const letterPageNav = document.getElementById('letter-page-nav');
             if (letterImageWrap && letterInlineImage) {
                 letterImageWrap.style.display = 'none';
                 letterImageWrap.classList.remove('visible');
                 letterInlineImage.src = '';
             }
+            if (letterPageNav) letterPageNav.classList.remove('visible');
             if (letterFrame && letterContent) {
                 letterContent.textContent = '';
                 letterContent.classList.remove('typing-complete');
                 const cursor = document.createElement('span');
                 cursor.className = 'letter-cursor';
                 letterContent.appendChild(cursor);
+                // Khung rung nhẹ khi mở
+                letterFrame.classList.remove('shaking');
                 letterFrame.classList.add('visible');
+                void letterFrame.offsetWidth;
+                letterFrame.classList.add('shaking');
                 startLetterTypingEffect(letterContent, cursor);
+            }
+            // Gắn sự kiện nút điều hướng (chỉ gắn 1 lần)
+            const prevBtn = document.getElementById('letterPrevBtn');
+            const nextBtn = document.getElementById('letterNextBtn');
+            if (prevBtn && !prevBtn.dataset.bound) {
+                prevBtn.dataset.bound = '1';
+                prevBtn.addEventListener('click', () => goToLetterPage(-1));
+            }
+            if (nextBtn && !nextBtn.dataset.bound) {
+                nextBtn.dataset.bound = '1';
+                nextBtn.addEventListener('click', () => goToLetterPage(1));
+            }
+            // Tap vào ảnh → trang tiếp theo
+            const imgEl = document.getElementById('letterInlineImage');
+            if (imgEl && !imgEl.dataset.bound) {
+                imgEl.dataset.bound = '1';
+                imgEl.addEventListener('click', () => goToLetterPage(1));
             }
         }
 
@@ -2213,6 +3152,45 @@
             } catch (e) {
                 console.warn('Không thể dừng nhạc nền:', e);
             }
+        }
+
+        // ── Nhạc riêng cho lá thư ────────────────────────────────────────
+        const letterMusicSrc = cfg.letterMusic || '';
+        const letterMusic = letterMusicSrc ? new Audio(letterMusicSrc) : null;
+        if (letterMusic) {
+            letterMusic.loop = true;
+            letterMusic.volume = 0;
+            letterMusic.preload = 'auto';
+        }
+        let _letterMusicFadeTimer = null;
+
+        function switchToLetterMusic() {
+            if (!letterMusic) return; // Không có file → giữ nhạc cũ
+            const targetVol = typeof cfg.letterVolume === 'number' ? cfg.letterVolume : 0.65;
+            // Fade out nhạc nền
+            const bgVol0 = bgMusic.volume;
+            const steps = 20, interval = 50; // 1s fade
+            let step = 0;
+            clearInterval(_letterMusicFadeTimer);
+            _letterMusicFadeTimer = setInterval(() => {
+                step++;
+                const ratio = step / steps;
+                try { bgMusic.volume = Math.max(0, bgVol0 * (1 - ratio)); } catch(_) {}
+                if (step >= steps) {
+                    clearInterval(_letterMusicFadeTimer);
+                    try { bgMusic.pause(); } catch(_) {}
+                    // Fade in nhạc thư
+                    letterMusic.currentTime = 0;
+                    letterMusic.volume = 0;
+                    letterMusic.play().catch(() => {});
+                    let s2 = 0;
+                    _letterMusicFadeTimer = setInterval(() => {
+                        s2++;
+                        try { letterMusic.volume = Math.min(targetVol, targetVol * (s2 / steps)); } catch(_) {}
+                        if (s2 >= steps) clearInterval(_letterMusicFadeTimer);
+                    }, interval);
+                }
+            }, interval);
         }
         // ════════════════════════════════════════════════════════════════
         // PASSCODE
